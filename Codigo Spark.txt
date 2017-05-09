@@ -1,0 +1,32 @@
+// Input file
+val inputFile = sc.textFile("/tmp/show-spark/input.txt")
+
+
+//Vamos a comencar con el proceso
+
+//Lo primero que haremos será separar los elementos del RDD(que al  principio son lineas por defecto), en palabras.
+
+val counts = inputFile.flatMap(line => line.split(" "))
+
+//Ahora vamos a transformar cada elemento del RDD, cuyo formato es string en un RDD cuyo formato sea (string,1) por lo tanto en el siguiente RDD(counts 2) tendremos 
+//como elementos cada una de las palabras que conformaban el texto que hemos introducido como input file y un 1 en el segundo elemento
+
+val counts2=counts.map(word => (word, 1))
+
+//Con la funcion reduceByKey lo que conseguiremos es los elementos cuyas palabras sean iguales sumen su 1, asi conseguiremos un RDD sin palabras repetidas y cuyo
+//numero sea la suma de las palabras iguales a esta que habia en el RDD anterior
+
+val counts3=counts2.reduceByKey(_ + _)
+
+// Con las siguientes lineas de codigo almacenamos el resultado en  HDFS 
+
+counts.toDebugString
+
+
+counts.cache()
+
+
+counts.count()
+
+
+counts.saveAsTextFile("/tmp/show-spark/output");
